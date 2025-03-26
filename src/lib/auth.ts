@@ -41,8 +41,18 @@ if (typeof window === 'undefined') {
   checkEnvVars();
 }
 
+// Create a safe adapter that only runs on the server
+const getSafeAdapter = () => {
+  // Only use PrismaAdapter on the server
+  if (typeof window === 'undefined') {
+    return PrismaAdapter(prisma);
+  }
+  // Return null for client-side rendering
+  return undefined;
+};
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: getSafeAdapter(),
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -77,26 +87,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return token;
         }
         
-        // Only look up the user if we don't have the role yet
-        if (!token.role) {
-          const dbUser = await prisma.user.findFirst({
-            where: {
-              email: token.email,
-            },
-          });
+        // Only look up the user if we don't have the role yet and we're on the server
+        if (!token.role && typeof window === 'undefined') {
+          try {
+            const dbUser = await prisma.user.findFirst({
+              where: {
+                email: token.email,
+              },
+            });
 
-          if (dbUser) {
-            token.id = dbUser.id;
-            token.name = dbUser.name;
-            token.email = dbUser.email;
-            token.picture = dbUser.image;
-            token.role = dbUser.role;
+            if (dbUser) {
+              token.id = dbUser.id;
+              token.name = dbUser.name;
+              token.email = dbUser.email;
+              token.picture = dbUser.image;
+              token.role = dbUser.role || "USER";
+            } else {
+              // Set default role if user not found
+              token.role = "USER";
+            }
+          } catch (dbError) {
+            console.error("Database lookup error:", dbError);
+            // Set default role if database lookup fails
+            token.role = "USER";
           }
+        } else if (!token.role) {
+          // Set default role for client-side
+          token.role = "USER";
         }
         
         return token;
       } catch (error) {
         console.error("JWT callback error:", error);
+        // Ensure token has a role even if there's an error
+        if (!token.role) token.role = "USER";
         return token;
       }
     },
