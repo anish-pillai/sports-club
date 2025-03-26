@@ -4,7 +4,8 @@ import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { signIn } from "@/lib/auth";
+// Import from our client-side auth utilities
+import { signInWithGoogle } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -47,11 +48,12 @@ function LoginContent() {
     try {
       setIsLoading(true);
       setError(null);
-      await signIn("google", { redirectTo: "/" });
+      // Use our helper function from auth-client.ts
+      await signInWithGoogle("/");
+      // Note: With redirect: true, the code below may not execute as the page will redirect
     } catch (error) {
       console.error("Login failed:", error);
       setError("Failed to sign in with Google. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   };

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { signInWithGoogle, handleSignOut } from "@/lib/auth-client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -84,13 +85,13 @@ export function Navbar() {
                     <Link href="/admin">Admin Dashboard</Link>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={() => signOut()}>
+                <DropdownMenuItem onClick={() => handleSignOut()}>
                   Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button onClick={() => signIn("google")}>Sign In</Button>
+            <Button onClick={() => signInWithGoogle()}>Sign In</Button>
           )}
         </div>
       </div>

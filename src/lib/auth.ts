@@ -4,6 +4,9 @@ import GoogleProvider from "next-auth/providers/google";
 
 import { prisma } from "@/lib/db";
 
+// IMPORTANT: This file should only be imported in server components or API routes
+// For client components, use next-auth/react instead
+
 // Define custom User type with role
 declare module "next-auth" {
   interface User {
@@ -51,7 +54,9 @@ const getSafeAdapter = () => {
   return undefined;
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// Export only the handlers and auth function for server-side usage
+// Do NOT export signIn and signOut here - they should be imported from next-auth/react in client components
+export const { handlers, auth } = NextAuth({
   adapter: getSafeAdapter(),
   session: {
     strategy: "jwt",

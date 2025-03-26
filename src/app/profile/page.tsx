@@ -24,7 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { signOut } from "next-auth/react";
+import { handleSignOut } from "@/lib/auth-client";
 
 // Mock data for user bookings
 const MOCK_BOOKINGS = [
@@ -217,7 +217,7 @@ export default function ProfilePage() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => signOut({ callbackUrl: "/" })}
+                  onClick={() => handleSignOut("/")}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
