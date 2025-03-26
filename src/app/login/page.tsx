@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { signIn } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -10,14 +10,46 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check for error parameters in the URL
+  useEffect(() => {
+    const errorType = searchParams?.get("error");
+    if (errorType) {
+      switch (errorType) {
+        case "OAuthSignin":
+        case "OAuthCallback":
+        case "OAuthCreateAccount":
+        case "EmailCreateAccount":
+        case "Callback":
+          setError("There was a problem with the authentication service. Please try again.");
+          break;
+        case "OAuthAccountNotLinked":
+          setError("This email is already associated with another account.");
+          break;
+        case "EmailSignin":
+          setError("The email could not be sent.");
+          break;
+        case "CredentialsSignin":
+          setError("The credentials you provided are invalid.");
+          break;
+        default:
+          setError("An unknown error occurred. Please try again.");
+          break;
+      }
+    }
+  }, [searchParams]);
 
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       await signIn("google", { redirectTo: "/" });
     } catch (error) {
       console.error("Login failed:", error);
+      setError("Failed to sign in with Google. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -36,6 +68,9 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
+          {error && (
+            <div className="text-red-500">{error}</div>
+          )}
           <Button
             className="w-full"
             variant="outline"

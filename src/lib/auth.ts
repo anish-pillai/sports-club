@@ -4,6 +4,43 @@ import GoogleProvider from "next-auth/providers/google";
 
 import { prisma } from "@/lib/db";
 
+// Define custom User type with role
+declare module "next-auth" {
+  interface User {
+    role?: string;
+  }
+  interface Session {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      image?: string | null;
+      role: string;
+    }
+  }
+}
+
+// Ensure required environment variables are present
+const checkEnvVars = () => {
+  const requiredVars = [
+    'NEXTAUTH_URL',
+    'NEXTAUTH_SECRET',
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET'
+  ];
+  
+  for (const envVar of requiredVars) {
+    if (!process.env[envVar]) {
+      console.error(`Missing environment variable: ${envVar}`);
+    }
+  }
+};
+
+// Only run in server context
+if (typeof window === 'undefined') {
+  checkEnvVars();
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
@@ -12,11 +49,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/login",
+    error: "/login", // Redirect to login page on error
   },
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
   callbacks: {
@@ -31,26 +69,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
     async jwt({ token, user }) {
-      const dbUser = await prisma.user.findFirst({
-        where: {
-          email: token.email,
-        },
-      });
-
-      if (!dbUser) {
+      try {
+        // Only query database when needed
         if (user) {
           token.id = user.id;
+          token.role = user.role || "USER";
+          return token;
         }
+        
+        // Only look up the user if we don't have the role yet
+        if (!token.role) {
+          const dbUser = await prisma.user.findFirst({
+            where: {
+              email: token.email,
+            },
+          });
+
+          if (dbUser) {
+            token.id = dbUser.id;
+            token.name = dbUser.name;
+            token.email = dbUser.email;
+            token.picture = dbUser.image;
+            token.role = dbUser.role;
+          }
+        }
+        
+        return token;
+      } catch (error) {
+        console.error("JWT callback error:", error);
         return token;
       }
-
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        picture: dbUser.image,
-        role: dbUser.role,
-      };
     },
   },
   debug: process.env.NODE_ENV === "development",

@@ -1,5 +1,13 @@
 {
   "buildCommand": "prisma generate && next build",
   "installCommand": "pnpm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "env": {
+    "NEXTAUTH_URL": "https://sports-club-pearl.vercel.app"
+  },
+  "build": {
+    "env": {
+      "PRISMA_GENERATE_DATAPROXY": "true"
+    }
+  }
 }
