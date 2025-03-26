@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma - DO NOT ignore these files for Vercel deployment
+!.prisma/
+!prisma/client/

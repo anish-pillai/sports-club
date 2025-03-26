@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   // Ignore ESLint errors during build
   eslint: {
@@ -39,6 +41,18 @@ const nextConfig = {
         net: false,
         tls: false,
         dns: false,
+        path: false,
+        os: false,
+        crypto: false,
+      };
+      
+      // For client-side, replace Prisma with empty modules
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@prisma/client$': path.resolve(__dirname, './src/lib/prisma-browser.ts'),
+        '@prisma/client/runtime/library': path.resolve(__dirname, './src/lib/prisma-browser.ts'),
+        '.prisma/client$': path.resolve(__dirname, './src/lib/prisma-browser.ts'),
+        '@auth/prisma-adapter$': path.resolve(__dirname, './src/lib/empty-module.ts'),
       };
     }
     return config;
