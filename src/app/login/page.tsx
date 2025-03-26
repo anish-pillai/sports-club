@@ -19,8 +19,17 @@ function LoginContent() {
   // Check for error parameters in the URL
   useEffect(() => {
     const errorType = searchParams?.get("error");
+    console.log("URL error parameter:", errorType);
+    
+    // Also log all search params for debugging
+    console.log("All search params:", Object.fromEntries([...searchParams?.entries() || []]));
+    
     if (errorType) {
       switch (errorType) {
+        case "Configuration":
+          setError("There is a server configuration issue. Please contact the administrator.");
+          console.error("NextAuth Configuration error: Missing environment variables in production");
+          break;
         case "OAuthSignin":
         case "OAuthCallback":
         case "OAuthCreateAccount":
@@ -48,8 +57,10 @@ function LoginContent() {
     try {
       setIsLoading(true);
       setError(null);
+      console.log("Starting Google sign-in process...");
       // Use our helper function from auth-client.ts
       await signInWithGoogle("/");
+      console.log("Sign-in function called successfully");
       // Note: With redirect: true, the code below may not execute as the page will redirect
     } catch (error) {
       console.error("Login failed:", error);

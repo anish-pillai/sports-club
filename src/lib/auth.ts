@@ -32,10 +32,24 @@ const checkEnvVars = () => {
     'GOOGLE_CLIENT_SECRET'
   ];
   
+  const missingVars = [];
+  
   for (const envVar of requiredVars) {
     if (!process.env[envVar]) {
       console.error(`Missing environment variable: ${envVar}`);
+      missingVars.push(envVar);
     }
+  }
+  
+  if (missingVars.length > 0) {
+    console.error(`Authentication will fail due to missing environment variables: ${missingVars.join(', ')}`);
+  } else {
+    console.log('All required environment variables are present');
+  }
+  
+  // Log the NEXTAUTH_URL to verify it's correct
+  if (process.env.NEXTAUTH_URL) {
+    console.log(`NEXTAUTH_URL is set to: ${process.env.NEXTAUTH_URL}`);
   }
 };
 

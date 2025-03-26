@@ -19,12 +19,19 @@ export { useSession };
 // Helper function to handle Google sign-in with error handling
 export const signInWithGoogle = async (callbackUrl = "/") => {
   try {
-    return await nextAuthSignIn("google", {
+    console.log("Auth client: Starting Google sign-in with callbackUrl:", callbackUrl);
+    
+    // Use the client-side signIn function with proper configuration
+    const result = await nextAuthSignIn("google", {
       callbackUrl,
       redirect: true
     });
+    
+    console.log("Auth client: Sign-in result:", result);
+    return result;
   } catch (error) {
-    console.error("Google sign-in failed:", error);
+    console.error("Auth client: Google sign-in failed:", error);
+    // Rethrow the error so it can be caught by the component
     throw error;
   }
 };
