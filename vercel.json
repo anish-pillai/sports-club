@@ -3,7 +3,8 @@
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "env": {
-    "NEXTAUTH_URL": "https://sports-club-pearl.vercel.app"
+    "NEXTAUTH_URL": "https://sports-club-pearl.vercel.app",
+    "PRISMA_CLIENT_ENGINE_TYPE": "dataproxy"
   },
   "build": {
     "env": {

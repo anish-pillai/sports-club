@@ -1,0 +1,2 @@
+# Configure Prisma to use the Data Proxy
+datasource_url_overrides = { "*" = "${env:DATABASE_URL}" }

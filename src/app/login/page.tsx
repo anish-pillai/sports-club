@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -8,7 +8,8 @@ import { signIn } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function LoginPage() {
+// Main login component that uses useSearchParams
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -96,12 +97,25 @@ export default function LoginPage() {
             )}
           </Button>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-            By signing in, you agree to our Terms of Service and Privacy Policy.
-          </div>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            By signing in, you agree to our Terms of Service and Privacy Policy
+          </p>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+// Wrapper component with Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
