@@ -31,6 +31,15 @@ export const signInWithGoogle = async (callbackUrl = "/") => {
     return result;
   } catch (error) {
     console.error("Auth client: Google sign-in failed:", error);
+    
+    // Check for specific OAuth errors
+    const errorObj = error as any;
+    if (errorObj?.message?.includes('invalid_client') || 
+        errorObj?.error?.includes('invalid_client')) {
+      console.error('OAuth client error: The Google OAuth client ID or secret may be incorrect or missing');
+      throw new Error('Authentication failed: OAuth client configuration error. Please contact the administrator.');
+    }
+    
     // Rethrow the error so it can be caught by the component
     throw error;
   }

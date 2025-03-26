@@ -4,11 +4,7 @@
   "framework": "nextjs",
   "env": {
     "NEXTAUTH_URL": "https://sports-club-pearl.vercel.app",
-    "PRISMA_CLIENT_ENGINE_TYPE": "dataproxy",
-    "NEXTAUTH_SECRET": "${NEXTAUTH_SECRET}",
-    "GOOGLE_CLIENT_ID": "${GOOGLE_CLIENT_ID}",
-    "GOOGLE_CLIENT_SECRET": "${GOOGLE_CLIENT_SECRET}",
-    "DATABASE_URL": "${DATABASE_URL}"
+    "PRISMA_CLIENT_ENGINE_TYPE": "dataproxy"
   },
   "build": {
     "env": {
