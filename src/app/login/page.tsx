@@ -27,8 +27,8 @@ function LoginContent() {
     if (errorType) {
       switch (errorType) {
         case "Configuration":
-          setError("There is a server configuration issue. Please contact the administrator.");
-          console.error("NextAuth Configuration error: Missing environment variables in production");
+          setError("Authentication service configuration issue. Please contact the administrator.");
+          console.error("NextAuth Configuration error detected");
           break;
         case "OAuthSignin":
         case "OAuthCallback":

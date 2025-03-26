@@ -23,8 +23,11 @@ declare module "next-auth" {
   }
 }
 
-// Ensure required environment variables are present
+// Ensure required environment variables are present - SERVER SIDE ONLY
 const checkEnvVars = () => {
+  // Only run this check on the server
+  if (typeof window !== 'undefined') return;
+  
   const requiredVars = [
     'NEXTAUTH_URL',
     'NEXTAUTH_SECRET',
@@ -53,10 +56,8 @@ const checkEnvVars = () => {
   }
 };
 
-// Only run in server context
-if (typeof window === 'undefined') {
-  checkEnvVars();
-}
+// Run the check immediately (will only execute on server)
+checkEnvVars();
 
 // Create a safe adapter that only runs on the server
 const getSafeAdapter = () => {
